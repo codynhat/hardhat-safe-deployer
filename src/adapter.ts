@@ -52,7 +52,7 @@ export class SafeProviderAdapter implements EthereumProvider {
         }
         const result = await this.wrapped.request(args)
         if (args.method === 'eth_accounts') {
-            result.push(this.safe)
+            result.push(safeAddress)
         }
         return result
     }
