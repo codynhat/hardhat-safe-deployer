@@ -14,19 +14,22 @@ export class SafeProviderAdapter implements EthereumProvider {
     safe: Promise<Safe>
     safeService: SafeService
     safeSigner: Promise<SafeEthersSigner>
-    signer: Signer
+    signer: Promise<Signer>
     wrapped: any
-    constructor(wrapped: any, signer: Signer, safeAddress: string, serviceUrl?: string) {
+    constructor(wrapped: any, signer: Promise<Signer>, safeAddress: string, serviceUrl?: string) {
         this.wrapped = wrapped
         this.signer = signer
-        const ethAdapter = new EthersAdapter({
-          ethers: ethers as any,
-          signer: signer as any
-        });
-        this.safe = Safe.create({
-          ethAdapter,
-          safeAddress,
-        });
+        this.safe = this.signer.then((_signer) => {
+            const ethAdapter = new EthersAdapter({
+              ethers: ethers as any,
+              signer: _signer as any
+            });
+            
+            return Safe.create({
+              ethAdapter,
+              safeAddress,
+            });
+        })
         this.safeService = new SafeService(serviceUrl ?? "https://safe-transaction.gnosis.io/");
         this.safeSigner = this.safe.then(s => new SafeEthersSigner(s, this.safeService, this.wrapped));
     }
