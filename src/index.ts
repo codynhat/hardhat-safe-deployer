@@ -7,7 +7,7 @@ export const setupSafeDeployer = (signerAddress: string, safeAddress: string, se
     extendEnvironment((env) => {
         env.network.provider = new SafeProviderAdapter(
           env.network.provider,
-          env.ethers.getSigner(signerAddress).then(s => s as Signer),
+          env.ethers.getSigner(signerAddress).then(s => s as unknown as Signer),
           safeAddress,
           serviceUrl
         )
